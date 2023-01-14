@@ -176,6 +176,7 @@ function Test() {
                 setLoading(false);
                 const newResponseHeaders = new Array<{ name: string; value: string }>();
                 res.headers.forEach((value, name) => newResponseHeaders.push({ name, value }));
+                newResponseHeaders.push(...newResponseHeaders);
                 setResponseHeaders(newResponseHeaders);
                 return res.text();
             })
@@ -274,7 +275,7 @@ function Test() {
                     </TabItem>
                     {/* 请求头 */}
                     <TabItem tabsValue={rsponseTabsValue} index={1}>
-                        <TableContainer component={Box} sx={{ maxHeight: '100%' }}>
+                        <TableContainer component={Box} sx={{ maxHeight: 'calc(60vh - 130px)' }}>
                             <Table stickyHeader size="small">
                                 <TableBody>
                                     {sendHeaders.map((row, index) => (
@@ -289,7 +290,7 @@ function Test() {
                     </TabItem>
                     {/* 响应头 */}
                     <TabItem tabsValue={rsponseTabsValue} index={2}>
-                        <TableContainer component={Box} sx={{ maxHeight: '100%' }}>
+                        <TableContainer component={Box} sx={{ maxHeight: 'calc(60vh - 130px)' }}>
                             <Table stickyHeader size="small">
                                 <TableBody>
                                     {responseHeaders.map((row, index) => (
