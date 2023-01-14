@@ -176,7 +176,6 @@ function Test() {
                 setLoading(false);
                 const newResponseHeaders = new Array<{ name: string; value: string }>();
                 res.headers.forEach((value, name) => newResponseHeaders.push({ name, value }));
-                newResponseHeaders.push(...newResponseHeaders);
                 setResponseHeaders(newResponseHeaders);
                 return res.text();
             })
