@@ -180,7 +180,10 @@ function Test() {
                 return res.text();
             })
             .then((text) => setResponseData(text))
-            .catch((e) => console.log(e));
+            .catch((e) => {
+                setLoading(false);
+                window.alert(e.message);
+            });
     };
 
     return (
