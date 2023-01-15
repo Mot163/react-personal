@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import MonacoEditor from '@monaco-editor/react';
+import MonacoEditor, { loader } from '@monaco-editor/react';
+
+// MonacoEditor CDN 加载配置
+loader.config({ paths: { vs: 'https://cdn.staticfile.org/monaco-editor/0.33.0/min/vs' } });
 
 /**
  * 编辑器语言枚举
