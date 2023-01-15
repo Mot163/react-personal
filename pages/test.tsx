@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
     Box,
     MenuItem,
@@ -14,35 +15,16 @@ import {
 } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Send as SendIcon } from '@mui/icons-material';
-import React, { useState } from 'react';
 import CodeEditer, { LanguageEnum } from '../componets/base/CodeEditer';
 import RequestHeader, { HeaderRowConstruct } from '../componets/test/RequestHeader';
 import RequestQuery, { QueryRowConstruct } from '../componets/test/RequestQuery';
 
-// 布局样式
-const boxStyle = { backgroundColor: 'white' };
-const containerStyle = { height: '100vh', padding: '10px' };
-const bodyStyle = { height: '40vh' };
-const feetStyle = { flex: 1 };
-
-/**
- * 标签页
- */
-function TabItem({ tabsValue, index, children }: { tabsValue: number; index: number; children?: React.ReactNode }) {
-    return (
-        <Box hidden={tabsValue !== index} sx={{ flex: 1, padding: '5px', height: 0 }}>
-            {children}
-        </Box>
-    );
-}
-
 /** 默认请求Headers */
 const defaultRequestHeaders = {
-    Accept: '*/*',
+    'Accept': '*/*',
     'Accept-Encoding': 'gzip, deflate, br',
-    'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.76',
-    Connection: 'keep-alive'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.76',
+    'Connection': 'keep-alive'
 };
 
 /**
@@ -51,11 +33,8 @@ const defaultRequestHeaders = {
  * @param str url字符串
  */
 function isUrl(str: string): boolean {
-    var v = new RegExp(
-        '^((https|http)://)(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$',
-        'i'
-    );
-    return v.test(str);
+    const regExpStr = '^((https|http)://)(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+    return new RegExp(regExpStr, 'i').test(str);
 }
 
 /**
@@ -96,6 +75,17 @@ function textFormat(text: string): string {
             break;
     }
     return text;
+}
+
+/**
+ * 标签页
+ */
+function TabItem({ tabsValue, index, children }: { tabsValue: number; index: number; children?: React.ReactNode }) {
+    return (
+        <Box hidden={tabsValue !== index} sx={{ flex: 1, padding: '5px', height: 0 }}>
+            {children}
+        </Box>
+    );
 }
 
 /**
@@ -168,14 +158,13 @@ function Test() {
         headerArray.forEach((header) => (headers[header.name] = header.value));
         setSendHeaders(Object.entries(headers).map((header) => ({ name: header[0], value: header[1] })));
         const options: { [key: string]: any } = { method, headers };
-        if (requestBody !== '') {
-            options.body = requestBody;
-        }
+        requestBody !== '' && (options.body = requestBody);
         fetch(url, options)
             .then((res) => {
                 setLoading(false);
                 const newResponseHeaders = new Array<{ name: string; value: string }>();
                 res.headers.forEach((value, name) => newResponseHeaders.push({ name, value }));
+                newResponseHeaders.push(...newResponseHeaders);
                 setResponseHeaders(newResponseHeaders);
                 return res.text();
             })
@@ -187,8 +176,8 @@ function Test() {
     };
 
     return (
-        <Box sx={boxStyle}>
-            <Stack spacing={0.25} sx={containerStyle}>
+        <Box sx={{ backgroundColor: 'white' }}>
+            <Stack spacing={0.25} sx={{ height: '100vh', padding: '10px' }}>
                 {/* 接口地址栏 */}
                 <Stack direction="row" spacing={0.25}>
                     <Select
@@ -202,14 +191,11 @@ function Test() {
                     </Select>
                     <TextField
                         variant="outlined"
-                        label="接口地址"
-                        value={url}
                         size="small"
+                        label="接口地址"
                         sx={{ flex: 1 }}
-                        onChange={(e) => {
-                            const newUrl = e.target.value;
-                            setUrl(newUrl);
-                        }}
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
                         error={url !== '' && !isUrl(url)}
                         onKeyDown={(e) => e.key === 'Enter' && send()}
                     />
@@ -227,7 +213,7 @@ function Test() {
                 </Stack>
 
                 {/* 接口请求栏 */}
-                <Stack sx={bodyStyle}>
+                <Stack sx={{ height: '40vh' }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={requestTabsValue} onChange={(e, value) => setRequestTabsValue(value)}>
                             <Tab label="Header" />
@@ -254,7 +240,7 @@ function Test() {
                 </Stack>
 
                 {/* 接口响应栏 */}
-                <Stack sx={feetStyle}>
+                <Stack sx={{ flex: 1, height: 0 }}>
                     <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                         <Tabs value={rsponseTabsValue} onChange={(e, value) => setResponseTabsValue(value)}>
                             <Tab label="实时响应" />
@@ -274,7 +260,7 @@ function Test() {
                     </TabItem>
                     {/* 请求头 */}
                     <TabItem tabsValue={rsponseTabsValue} index={1}>
-                        <TableContainer component={Box} sx={{ maxHeight: 'calc(60vh - 130px)' }}>
+                        <TableContainer component={Box} sx={{ maxHeight: '100%' }}>
                             <Table stickyHeader size="small">
                                 <TableBody>
                                     {sendHeaders.map((row, index) => (
@@ -289,7 +275,7 @@ function Test() {
                     </TabItem>
                     {/* 响应头 */}
                     <TabItem tabsValue={rsponseTabsValue} index={2}>
-                        <TableContainer component={Box} sx={{ maxHeight: 'calc(60vh - 130px)' }}>
+                        <TableContainer component={Box} sx={{ maxHeight: '100%' }}>
                             <Table stickyHeader size="small">
                                 <TableBody>
                                     {responseHeaders.map((row, index) => (
