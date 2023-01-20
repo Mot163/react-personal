@@ -1,4 +1,5 @@
 import { request, FormData } from 'undici';
+import CacheUtils from './CacheUtils';
 
 /** 登录api */
 const LOGIN_URL = 'https://pc.woozooo.com/account.php';
@@ -79,6 +80,11 @@ const LanZouUtils = {
      * @returns 直链
      */
     parse: async (fileId: string): Promise<any> => {
+        let directURL: string | undefined;
+        directURL = await CacheUtils.get(`LANZOU_DIRECT_URL_${fileId}`);
+        if (directURL) {
+            return directURL;
+        }
         const headers = {
             'user-agent':
                 'Mozilla/5.0 (Linux; U; Android 9; zh-cn; Redmi Note 5 Build/PKQ1.180904.001) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/71.0.3578.141 Mobile Safari/537.36 XiaoMi/MiuiBrowser/11.10.8',
@@ -91,10 +97,11 @@ const LanZouUtils = {
         const preffix = '(function(){var document={getElementById:function(){return document;}};';
         const suffix = 'for(var k in document)typeof document[k]=="function"&&document[k]();return document.href;})()';
         const tmpUrl = eval(preffix + html.substring(jsStart, jsEnd) + suffix);
-        const directURL = await request(tmpUrl, { headers }).then((res) => res.headers.location);
+        directURL = await request(tmpUrl, { headers }).then((res) => res.headers.location);
         if (!directURL) {
             throw new Error('解析失败');
         }
+        CacheUtils.set(`LANZOU_DIRECT_URL_${fileId}`, directURL);
         return directURL;
     }
 };
