@@ -101,7 +101,7 @@ const LanZouUtils = {
         if (!directURL) {
             throw new Error('解析失败');
         }
-        CacheUtils.set(`LANZOU_DIRECT_URL_${fileId}`, directURL);
+        CacheUtils.set(`LANZOU_DIRECT_URL_${fileId}`, directURL, 1800);
         return directURL;
     }
 };
