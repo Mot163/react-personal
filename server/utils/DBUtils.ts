@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import moment from 'moment';
 
 /** 默认数据库名称 */
 const DEFAULT_DATABASE = 'myFirstDatabase';
@@ -31,6 +32,20 @@ const DBUtils = {
         let model = mongoose.models[collection];
         if (!model) {
             const schema = new mongoose.Schema(construct);
+            // 时间格式化设置
+            for (const key in construct) {
+                const value = (construct as any)[key];
+                if (value === Date || value?.type === Date) {
+                    schema.path(key).get((date?: Date) => {
+                        if (!date) {
+                            return date;
+                        }
+                        return moment(date).utcOffset(8).format('YYYY-MM-DD HH:mm:ss');
+                    });
+                }
+            }
+            schema.set('toObject', { getters: true });
+            schema.set('toJSON', { getters: true });
             model = mongoose.model(collection, schema);
         }
         return model;
