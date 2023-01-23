@@ -10,6 +10,9 @@ import LanZouUtils from '../../../server/utils/LanZouUtils';
  * @param res 响应对象
  */
 async function parse(req: NextApiRequest, res: NextApiResponse) {
+    if (req.method !== 'GET') {
+        return Result.error({ code: 403, message: `不支持'${req.method}'请求` });
+    }
     if (!req.query.i) {
         return Result.ok({});
     }
